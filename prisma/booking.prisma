@@ -1,0 +1,25 @@
+model Booking {
+    id             String        @id @default(auto()) @map("_id") @db.ObjectId
+    userId         String        @db.ObjectId
+    tourId         String        @db.ObjectId
+    title          String
+    numberOfGuests Int
+    totalAmount    Int
+    status         BookingStatus @default(Pending)
+    paymentStatus  PaymentStatus @default(Unpaid)
+    specialRequest String?
+    isDeleted      Boolean       @default(false)
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+    // relations
+    user           User          @relation("UserBooking", fields: [userId], references: [id])
+    tour           Tour          @relation(fields: [tourId], references: [id])
+
+    @@map("booking")
+}
+
+enum BookingStatus {
+    Pending
+    Confirmed
+    Cancelled
+}

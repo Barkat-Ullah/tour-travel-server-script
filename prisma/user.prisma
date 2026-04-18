@@ -1,0 +1,83 @@
+model User {
+  id                            String          @id @default(auto()) @map("_id") @db.ObjectId
+  fullName                      String
+  email                         String          @unique
+  phoneNumber                   String?         @unique
+  password                      String
+  role                          UserRoleEnum    @default(USER)
+  status                        UserStatus      @default(ACTIVE)
+  clientInfo                    Json?
+  describe                      String?
+  city                          String?
+  address                       String?
+  image                         String?
+  isAgreeWithTerms              Boolean
+  plan                          PLanType
+  otp                           String?
+  otpExpiry                     DateTime?
+  emailVerificationToken        String?
+  emailVerificationTokenExpires String?
+  isEmailVerified               Boolean         @default(false)
+  // isApproved      Boolean @default(false)
+  isSocialLogin                 Boolean         @default(false)
+  isDeleted                     Boolean         @default(false)
+  stripeCustomerId              String?
+  fcmToken                      String?
+  lastLoginAt                   DateTime?
+  createdAt                     DateTime        @default(now())
+  updatedAt                     DateTime        @updatedAt
+  //relation
+  payments                      Payment[]
+  receiver                      Notification[]  @relation("Receiver")
+  sender                        Notification[]  @relation("Sender")
+  followers                     Follow[]        @relation("Followers")
+  following                     Follow[]        @relation("Following")
+  favorites                     Favorite[]      @relation("UserCreator")
+  roomSender                    Room[]          @relation("RoomSender")
+  roomReceiver                  Room[]          @relation("RoomReceiver")
+  //self relation
+  // createdById  String? @db.ObjectId
+  // createdBy    User?   @relation("UserCreation", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  // createdUsers User[]  @relation("UserCreation")
+  sentChats                     Chat[]          @relation("ChatSender")
+  receivedChats                 Chat[]          @relation("ChatReceiver")
+  socialAccount                 SocialAccount[]
+  booking                       Booking[]       @relation("UserBooking")
+  comment                       Comment[]       @relation("UserComment")
+  review                        Review[]
+
+  @@map("users")
+}
+
+model SocialAccount {
+  id         String             @id @default(auto()) @map("_id") @db.ObjectId
+  provider   SocialProviderEnum
+  providerId String
+  userId     String             @db.ObjectId
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime           @default(now())
+
+  @@unique([provider, providerId])
+  @@index([userId])
+  @@map("social_accounts")
+}
+
+enum SocialProviderEnum {
+  GOOGLE
+  FACEBOOK
+}
+
+enum UserRoleEnum {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum PLanType {
+  Free
+  Paid
+}

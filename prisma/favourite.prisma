@@ -1,0 +1,30 @@
+model Favorite {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  tourId     String   @db.ObjectId
+  isFavorite Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  //relation
+  tour       Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  user       User     @relation("UserCreator", fields: [userId], references: [id])
+
+  @@map("love_react")
+}
+
+model Comment {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  tourId      String    @db.ObjectId
+  parentId    String?   @db.ObjectId
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  // Relations
+  user        User      @relation("UserComment", fields: [userId], references: [id])
+  tour        Tour      @relation(fields: [tourId], references: [id])
+  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies     Comment[] @relation("CommentReplies")
+
+  @@map("comments")
+}

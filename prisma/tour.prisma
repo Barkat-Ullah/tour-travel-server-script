@@ -1,0 +1,68 @@
+enum TourStatus {
+    Upcoming
+    Ongoing
+    Completed
+}
+
+model Division {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    title     String   @unique
+    slug      String   @unique
+    image     String?
+    isDeleted Boolean  @default(false)
+    createdAt DateTime @default(now())
+    tour      Tour[]
+
+    @@map("Division")
+}
+
+model Tour {
+    id                String     @id @default(auto()) @map("_id") @db.ObjectId
+    divisionId        String     @db.ObjectId
+    title             String
+    description       String
+    image             String[]
+    location          String?
+    lat               Float?
+    lon               Float?
+    costFrom          Int?
+    startDate         DateTime
+    endDate           DateTime
+    departureLocation String?
+    arrivalLocation   String?
+    included          String[]
+    excluded          String[]
+    amenities         String[]
+    tourPlan          String[]
+    maxGuest          Int        @default(0)
+    minAge            Int        @default(0)
+    status            TourStatus @default(Upcoming)
+    isDeleted         Boolean    @default(false)
+    createdAt         DateTime   @default(now())
+    updatedAt         DateTime   @updatedAt
+    //relation
+    division          Division   @relation(fields: [divisionId], references: [id])
+    favorite          Favorite[]
+    booking           Booking[]
+    review            Review[]
+    comment           Comment[]
+    payment           Payment[]
+
+    @@map("tour")
+}
+
+model Review {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String   @db.ObjectId
+    tourId    String   @db.ObjectId
+    rating    Int      @default(5) // 1-5
+    comment   String?
+    isDeleted Boolean  @default(false)
+    createdAt DateTime @default(now())
+    //relation
+    user      User     @relation(fields: [userId], references: [id])
+    tour      Tour     @relation(fields: [tourId], references: [id])
+
+    @@unique([userId, tourId])
+    @@map("reviews")
+}
