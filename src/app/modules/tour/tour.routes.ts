@@ -4,6 +4,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { tourController } from './tour.controller';
 import { tourValidation } from './tour.validation';
 import { fileUploader } from '../../utils/fileUploader';
+import authOptional from '../../middlewares/authoptional';
 
 const router = express.Router();
 
@@ -17,11 +18,11 @@ router.post(
   tourController.createTour,
 );
 
-router.get('/', auth(), tourController.getTourList);
+router.get('/', authOptional(), tourController.getTourList);
 
-router.get('/my', auth(), tourController.getMyTour);
+router.get('/my', authOptional(), tourController.getMyTour);
 
-router.get('/:id', auth(), tourController.getTourById);
+router.get('/:id', authOptional(), tourController.getTourById);
 
 router.put(
   '/:id',

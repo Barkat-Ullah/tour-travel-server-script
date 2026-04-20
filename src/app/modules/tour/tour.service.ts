@@ -26,7 +26,7 @@ const createTour = async (req: Request) => {
   const files = req.files as
     | { [fieldname: string]: Express.Multer.File[] }
     | undefined;
-    
+
   let imageUrls: string[] = [];
   if (files?.image?.length) {
     const uploadPromises = files.image.map(file =>
@@ -73,6 +73,7 @@ type ITourFilterRequest = {
 const getTourList = async (
   options: IPaginationOptions,
   filters: ITourFilterRequest,
+  userId?: string,
 ) => {
   const {
     page,
@@ -101,6 +102,13 @@ const getTourList = async (
   const whereConditions: Prisma.TourWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
 
+  const favorite = await prisma.favorite.findMany({
+    where: { userId },
+    select: { tourId: true },
+  });
+  const favoriteIds = favorite.map(f => f.tourId);
+  whereConditions.id = { in: favoriteIds };
+
   const [result, total] = await Promise.all([
     prisma.tour.findMany({
       skip,
@@ -111,18 +119,28 @@ const getTourList = async (
     }),
     prisma.tour.count({ where: whereConditions }),
   ]);
+  const formattedData = result.map(tour => ({
+    ...tour,
+    isFavorite: favoriteIds.includes(tour.id),
+  }));
 
-  return { meta: { total, page, limit }, data: result };
+  return { meta: { total, page, limit }, data: formattedData };
 };
 
 // -------------------------------------------------------
 // GET TOUR BY ID
 // -------------------------------------------------------
-const getTourById = async (id: string) => {
+const getTourById = async (id: string, userId?: string) => {
+  const favorite = await prisma.favorite.findMany({
+    where: { userId },
+    select: { tourId: true },
+  });
+  const favoriteIds = favorite.map(f => f.tourId);  
   const result = await prisma.tour.findUnique({
     where: { id },
-    select: tourSelect,
+    select: {...tourSelect, isFavorite: favoriteIds.includes(id)},
   });
+
   if (!result) throw new ApiError(httpStatus.NOT_FOUND, 'Tour not found');
   return result;
 };
@@ -135,7 +153,8 @@ const getMyTour = async (
   options: IPaginationOptions,
   filters: ITourFilterRequest,
 ) => {
-  return getTourList(options, filters); 
+  const userId = req.user.id;
+  return getTourList(options, filters, userId);
 };
 
 // -------------------------------------------------------

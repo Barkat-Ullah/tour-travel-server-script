@@ -29,7 +29,7 @@ const createTour = catchAsync(async (req: Request, res: Response) => {
 const getTourList = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   const filters = pick(req.query, tourFilterableFields);
-  const result = await tourService.getTourList(options, filters);
+  const result = await tourService.getTourList(options, filters, req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -42,7 +42,7 @@ const getTourList = catchAsync(async (req: Request, res: Response) => {
 // get Tour by id
 const getTourById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await tourService.getTourById(id);
+  const result = await tourService.getTourById(id, req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -55,7 +55,7 @@ const getTourById = catchAsync(async (req: Request, res: Response) => {
 const getMyTour = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   const filters = pick(req.query, tourFilterableFields);
-  const result = await tourService.getMyTour(req, options, filters);
+  const result = await tourService.getMyTour(req.user.id, options, filters);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

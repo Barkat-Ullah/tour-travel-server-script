@@ -5,21 +5,19 @@ import ApiError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { paginationHelper } from '../../utils/calculatePagination';
 
-
-const createFavorite = async (userId: string, articleId: string) => {
-  // const article = await prisma.test.findUnique({
-  //   where: {
-  //     id: articleId,
-  //   },
-  // });
-  const article = {}
-  if (!article) {
-    throw new ApiError(404, 'Article not found');
+const createFavorite = async (userId: string, tourId: string) => {
+  const tour = await prisma.tour.findUnique({
+    where: {
+      id: tourId,
+    },
+  });
+  if (!tour) {
+    throw new ApiError(404, 'tour not found');
   }
   const existingFavorite = await prisma.favorite.findFirst({
     where: {
       userId,
-      articleId,
+      tourId,
     },
   });
 
@@ -28,12 +26,12 @@ const createFavorite = async (userId: string, articleId: string) => {
       where: { id: existingFavorite.id },
     });
     return {
-      articleId,
+      tourId,
       isFavorite: false,
       data: {
         id: existingFavorite.id,
         userId: existingFavorite.userId,
-        articleId: existingFavorite.articleId,
+        tourId: existingFavorite.tourId,
         isFavorite: false,
         createdAt: existingFavorite.createdAt,
         updatedAt: new Date(),
@@ -44,13 +42,13 @@ const createFavorite = async (userId: string, articleId: string) => {
     const newFavorite = await prisma.favorite.create({
       data: {
         userId,
-        articleId,
+        tourId,
         isFavorite: true,
       },
     });
 
     return {
-      articleId,
+      tourId,
       isFavorite: true,
       data: newFavorite,
       message: 'Added to favorites',
@@ -73,24 +71,28 @@ const getFavoriteListIntoDb = async (
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
 
-  const andConditions: Prisma.favoriteWhereInput[] = [];
+  const andConditions: Prisma.FavoriteWhereInput[] = [];
 
   andConditions.push({ userId });
 
-  // if (searchTerm) {
-  //   andConditions.push({
-  //     OR: [
-  //       {
-  //         article: {
-  //           title: {
-  //             contains: searchTerm,
-  //             mode: 'insensitive',
-  //           },
-  //         },
-  //       },
-  //     ],
-  //   });
-  // }
+  if (searchTerm) {
+    andConditions.push({
+      OR: [
+        {
+          tour: {
+            title: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+            location: {
+              contains: searchTerm,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ],
+    });
+  }
 
   if (Object.keys(filterData).length > 0) {
     Object.keys(filterData).forEach(key => {
@@ -123,14 +125,14 @@ const getFavoriteListIntoDb = async (
     });
   }
 
-  const whereConditions: Prisma.favoriteWhereInput =
+  const whereConditions: Prisma.FavoriteWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : { userId };
 
   const result = await prisma.favorite.findMany({
     where: whereConditions,
-    // include: {
-    //   article: true,
-    // },
+    include: {
+      tour: true,
+    },
     orderBy: { createdAt: 'desc' },
     skip,
     take: limit,
@@ -141,7 +143,7 @@ const getFavoriteListIntoDb = async (
   });
 
   const formattedData = result.map(fav => ({
-    // ...fav.article,
+    ...fav.tour,
     isFavorite: true,
   }));
 
