@@ -115,7 +115,23 @@ const getTourList = async (
       take: limit,
       where: whereConditions,
       orderBy: { [sortBy]: sortOrder as 'asc' | 'desc' },
-      select: tourSelect,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        thumbnail: true,
+        location: true,
+        costFrom: true,
+        startDate: true,
+        endDate: true,
+        status: true,
+        isDeleted: true,
+        createdAt: true,
+        division: {
+          select: { id: true, title: true, slug: true, image: true },
+        },
+        _count: { select: { favorite: true, review: true } },
+      },
     }),
     prisma.tour.count({ where: whereConditions }),
   ]);
@@ -135,10 +151,10 @@ const getTourById = async (id: string, userId?: string) => {
     where: { userId },
     select: { tourId: true },
   });
-  const favoriteIds = favorite.map(f => f.tourId);  
+  const favoriteIds = favorite.map(f => f.tourId);
   const result = await prisma.tour.findUnique({
     where: { id },
-    select: {...tourSelect, isFavorite: favoriteIds.includes(id)},
+    select: { ...tourSelect, isFavorite: favoriteIds.includes(id) },
   });
 
   if (!result) throw new ApiError(httpStatus.NOT_FOUND, 'Tour not found');
@@ -207,7 +223,6 @@ const updateTour = async (req: Request) => {
   const result = await prisma.tour.update({
     where: { id },
     data: updateData,
-    select: tourSelect,
   });
 
   return result;
@@ -239,7 +254,6 @@ const toggleStatusTour = async (id: string) => {
   const result = await prisma.tour.update({
     where: { id },
     data: { status: newStatus },
-    select: tourSelect,
   });
   return result;
 };
@@ -260,7 +274,6 @@ const softDeleteTour = async (id: string) => {
   const result = await prisma.tour.update({
     where: { id },
     data: { isDeleted: true },
-    select: tourSelect,
   });
   return result;
 };

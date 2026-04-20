@@ -7,6 +7,7 @@ import { AuthRouters } from '../modules/auth/auth.routes';
 import { notificationsRoute } from '../modules/notifications/notification.routes';
 import { tourRoutes } from "../modules/tour/tour.routes";
 import { divisionRoutes } from "../modules/division/division.routes";
+import { commentRoutes } from "../modules/comment/comment.routes";
 
 const router = express.Router();
 
@@ -46,6 +47,11 @@ const moduleRoutes = [
   {
     path: "/divisions",
     route: divisionRoutes,
+  },
+
+  {
+    path: "/comments",
+    route: commentRoutes,
   },
 ];
 
