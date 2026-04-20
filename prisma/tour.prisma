@@ -22,6 +22,7 @@ model Tour {
     title             String
     description       String
     image             String[]
+    thumbnail         String?
     location          String?
     lat               Float?
     lon               Float?

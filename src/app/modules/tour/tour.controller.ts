@@ -5,6 +5,15 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import pick from '../../utils/pickValidFields';
 
+// Filterable fields
+const tourFilterableFields = [
+  'searchTerm',
+  'id',
+  'createdAt',
+  'status',
+  'isDeleted',
+];
+
 // create Tour
 const createTour = catchAsync(async (req: Request, res: Response) => {
   const result = await tourService.createTour(req);
@@ -17,12 +26,6 @@ const createTour = catchAsync(async (req: Request, res: Response) => {
 });
 
 // get all Tour
-const tourFilterableFields = [
-  'searchTerm',
-  'id',
-  'createdAt',
-  'status',
-];
 const getTourList = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   const filters = pick(req.query, tourFilterableFields);

@@ -6,10 +6,8 @@ import { tourValidation } from './tour.validation';
 import { fileUploader } from '../../utils/fileUploader';
 
 const router = express.Router();
-const fileUpload = fileUploader.upload.fields([
-    { name: 'image', maxCount: 10 },
-    { name: 'video', maxCount: 1 },
-  ]);
+
+const fileUpload = fileUploader.tourImageUpload;
 
 router.post(
   '/',
@@ -33,17 +31,9 @@ router.put(
   tourController.updateTour,
 );
 
-router.patch(
-  '/toggle-status/:id',
-  auth(),
-  tourController.toggleStatusTour,
-);
+router.patch('/toggle-status/:id', auth(), tourController.toggleStatusTour);
 
-router.delete(
-  '/soft-delete/:id',
-  auth(),
-  tourController.softDeleteTour,
-);
+router.delete('/soft-delete/:id', auth(), tourController.softDeleteTour);
 
 router.delete('/:id', auth(), tourController.deleteTour);
 

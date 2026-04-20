@@ -1,5 +1,10 @@
 import { Prisma } from '@prisma/client';
-import { toUTCEndOfDay, toUTCEndOfMonth, toUTCStartOfDay, toUTCStartOfMonth } from '../../utils/utcDate';
+import {
+  toUTCEndOfDay,
+  toUTCEndOfMonth,
+  toUTCStartOfDay,
+  toUTCStartOfMonth,
+} from '../../utils/utcDate';
 
 export const buildFilterConditions = (
   filterData: Record<string, any>,
@@ -12,9 +17,7 @@ export const buildFilterConditions = (
 
     if (key === 'createdAt') {
       const parts = (value as string).split('-');
-
       if (parts.length === 2) {
-        // Format: "YYYY-MM" →
         const year = parseInt(parts[0]);
         const month = parseInt(parts[1]) - 1;
         conditions.push({
@@ -24,7 +27,6 @@ export const buildFilterConditions = (
           },
         });
       } else if (parts.length === 3) {
-        // Format: "YYYY-MM-DD" →
         conditions.push({
           createdAt: {
             gte: toUTCStartOfDay(value),
@@ -43,7 +45,7 @@ export const buildFilterConditions = (
     }
 
     if (['isDeleted'].includes(key)) {
-       conditions.push({ [key]: value === 'true' });
+      conditions.push({ [key]: value === 'true' });
       return;
     }
 

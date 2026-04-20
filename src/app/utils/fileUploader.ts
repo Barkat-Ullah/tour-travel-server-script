@@ -68,7 +68,13 @@ const uploadSingle = upload.single('image');
 const uploadFile = upload.single('file');
 
 // Upload multiple images
-const uploadMultipleImage = upload.fields([{ name: 'images', maxCount: 15 }]);
+const uploadMultipleImage = upload.fields([{ name: 'images', maxCount: 10  }]);
+
+const tourImageUpload = upload.fields([
+  { name: 'image', maxCount: 10 },
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 },
+]);
 
 const uploadToCloudinary = async (
   file: Express.Multer.File,
@@ -398,6 +404,7 @@ const uploadToZenexCloudWithType = async (
 };
 
 export const fileUploader = {
+  tourImageUpload,
   upload,
   uploadSingle,
   uploadMultipleImage,
