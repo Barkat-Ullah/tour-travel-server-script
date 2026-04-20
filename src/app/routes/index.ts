@@ -6,6 +6,7 @@ import { paymentRoutes } from '../modules/payment/payment.routes';
 import { AuthRouters } from '../modules/auth/auth.routes';
 import { notificationsRoute } from '../modules/notifications/notification.routes';
 import { tourRoutes } from "../modules/tour/tour.routes";
+import { divisionRoutes } from "../modules/division/division.routes";
 
 const router = express.Router();
 
@@ -40,6 +41,11 @@ const moduleRoutes = [
   {
     path: "/tours",
     route: tourRoutes,
+  },
+
+  {
+    path: "/divisions",
+    route: divisionRoutes,
   },
 ];
 
