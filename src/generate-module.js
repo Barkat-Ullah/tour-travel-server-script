@@ -243,7 +243,7 @@ const templates = async moduleName => {
   const updateFields = buildUpdateFields(model);
 
   const updateDataLines = updateFields
-    .map(f => `      ${f}: data.${f} ?? (existing${Capitalized} as any).${f},`)
+    .map(f => `      ${f}: data.${f} ?? existing${Capitalized}.${f},`)
     .join('\n');
 
   const statusField = model.fields.find(
