@@ -8,6 +8,7 @@ import { notificationsRoute } from '../modules/notifications/notification.routes
 import { tourRoutes } from "../modules/tour/tour.routes";
 import { divisionRoutes } from "../modules/division/division.routes";
 import { commentRoutes } from "../modules/comment/comment.routes";
+import { reviewRoutes } from "../modules/review/review.routes";
 
 const router = express.Router();
 
@@ -52,6 +53,11 @@ const moduleRoutes = [
   {
     path: "/comments",
     route: commentRoutes,
+  },
+
+  {
+    path: "/reviews",
+    route: reviewRoutes,
   },
 ];
 

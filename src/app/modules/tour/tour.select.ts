@@ -24,11 +24,23 @@ export const tourSelect = {
   status: true,
   isDeleted: true,
   createdAt: true,
-  division: { select: { id: true, title: true, slug: true, image: true } },
+  updatedAt: true,
+
+  // Relations
+  division: {
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      image: true,
+    },
+  },
+
   comment: {
     select: {
       id: true,
       description: true,
+      createdAt: true,
       user: {
         select: {
           id: true,
@@ -53,6 +65,7 @@ export const tourSelect = {
         select: {
           id: true,
           description: true,
+          createdAt: true,
           user: {
             select: {
               id: true,
@@ -64,11 +77,13 @@ export const tourSelect = {
       },
     },
   },
+
   review: {
     select: {
       id: true,
       rating: true,
       comment: true,
+      createdAt: true,
       user: {
         select: {
           id: true,
@@ -78,5 +93,12 @@ export const tourSelect = {
       },
     },
   },
-  _count: { select: { review: true, favorite: true, comment: true } },
+
+  _count: {
+    select: {
+      review: true,
+      favorite: true,
+      comment: true,
+    },
+  },
 } satisfies Prisma.TourSelect;

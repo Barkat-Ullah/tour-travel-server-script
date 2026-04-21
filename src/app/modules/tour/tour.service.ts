@@ -147,20 +147,31 @@ const getTourList = async (
 // GET TOUR BY ID
 // -------------------------------------------------------
 const getTourById = async (id: string, userId?: string) => {
-  const favorite = await prisma.favorite.findMany({
-    where: { userId },
-    select: { tourId: true },
-  });
-  const favoriteIds = favorite.map(f => f.tourId);
-  const result = await prisma.tour.findUnique({
+  const tour = await prisma.tour.findUnique({
     where: { id },
-    select: { ...tourSelect, isFavorite: favoriteIds.includes(id) },
+    select: tourSelect,
   });
 
-  if (!result) throw new ApiError(httpStatus.NOT_FOUND, 'Tour not found');
-  return result;
-};
+  if (!tour) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Tour not found');
+  }
 
+  let isFavorite = false;
+  if (userId) {
+    const favorite = await prisma.favorite.findFirst({
+      where: {
+        userId,
+        tourId: id,
+      },
+    });
+    isFavorite = !!favorite;
+  }
+
+  return {
+    ...tour,
+    isFavorite,
+  };
+};
 // -------------------------------------------------------
 // GET MY TOUR
 // -------------------------------------------------------
